@@ -48,7 +48,7 @@ nodeSelector: {}
 ## The best way ist to define a ClusterIP service and define one or more externalIPs. Of course this IPs must be available on the node the factorio pod runs on!
 service:
   type: NodePort
-  port: 31497
+  port: 34198
   ## If you are able to map an external IP, set it here
   # externalIPs:
   #  - "192.168.0.1"
@@ -222,12 +222,12 @@ server_settings:
   # Game visibility
   visibility:
     # Game will be published on the official Factorio matching server
-    public: false
+    public: true
     # Game will be broadcast on LAN
     lan: true
 
   # When set to true, the server will only allow clients that have a valid Factorio.com account
-  require_user_verification: false
+  require_user_verification: true
   # optional, default value is 0. 0 means unlimited.
   max_upload_in_kilobytes_per_second: 0
   # optional, default value is 5. 0 means unlimited.
