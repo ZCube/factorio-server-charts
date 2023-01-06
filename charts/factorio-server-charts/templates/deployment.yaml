@@ -23,11 +23,11 @@ spec:
         options:
           - name: ndots
             value: '1'
-      {{- if eq .Values.service.type "NodePort" }}
-      hostNetwork: true
-      {{- else }}
-      hostNetwork: false
-      {{- end }}
+      # {{- if eq .Values.service.type "NodePort" }}
+      # hostNetwork: true
+      # {{- else }}
+      # hostNetwork: false
+      # {{- end }}
 
       hostAliases:
       - ip: "127.0.0.1"
@@ -130,6 +130,15 @@ spec:
           periodSeconds: 10
           initialDelaySeconds: 5
           failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+              - /bin/bash
+              - -ec
+              - 'curl --fail localhost:34197/health || exit 1'
+          periodSeconds: 10
+          initialDelaySeconds: 5
+          failureThreshold: 3
         ports:
         - name: factorio
           containerPort: {{ .Values.service.port }}
@@ -160,6 +169,8 @@ spec:
           value: {{ .Values.factorioServer.load_latest_save | quote }}
         - name: CONFIG
           value: /factorio/configs
+        - name: BIND
+          value: "0.0.0.0"
         - name: PORT
           value: "{{ .Values.service.port }}"
       - name: {{ template "factorio-server-charts.fullname" . }}-sidecar
@@ -167,7 +178,7 @@ spec:
         command:
           - /factorio-port-fixer
           - local
-          - --ip=127.0.0.1
+          - --ip=0.0.0.0
           - --port=34197
           - --remotePort={{ .Values.service.port }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
