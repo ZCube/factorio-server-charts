@@ -23,12 +23,23 @@ spec:
         options:
           - name: ndots
             value: '1'
-      # {{- if eq .Values.service.type "NodePort" }}
-      # hostNetwork: true
-      # {{- else }}
-      # hostNetwork: false
-      # {{- end }}
+      {{- if and (not (and .Values.portFixer.enabled (not .Values.portFixer.remote))) (eq .Values.service.type "NodePort") }}
+      hostNetwork: true
+      {{- else }}
+      hostNetwork: false
+      {{- end }}
 
+      {{- if .Values.portFixer.enabled }}
+        {{- if .Values.portFixer.remote }}
+      hostAliases:
+      - ip: {{ .Values.portFixer.remoteIp | quote }}
+        hostnames:
+        - "pingpong"
+        - "pingpong1.factorio.com"
+        - "pingpong2.factorio.com"
+        - "pingpong3.factorio.com"
+        - "pingpong4.factorio.com"
+        {{- else }}
       hostAliases:
       - ip: "127.0.0.1"
         hostnames:
@@ -37,6 +48,8 @@ spec:
         - "pingpong2.factorio.com"
         - "pingpong3.factorio.com"
         - "pingpong4.factorio.com"
+        {{- end }}
+      {{- end }}
 
       initContainers:
         - name: volume-permissions-serversettingsconfig
@@ -130,6 +143,7 @@ spec:
           periodSeconds: 10
           initialDelaySeconds: 5
           failureThreshold: 3
+        {{- if and .Values.portFixer.enabled (not .Values.portFixer.remote) }}
         readinessProbe:
           exec:
             command:
@@ -139,6 +153,7 @@ spec:
           periodSeconds: 10
           initialDelaySeconds: 5
           failureThreshold: 3
+        {{- end }}
         ports:
         - name: factorio
           containerPort: {{ .Values.service.port }}
@@ -173,6 +188,7 @@ spec:
           value: "0.0.0.0"
         - name: PORT
           value: "{{ .Values.service.port }}"
+      {{- if and .Values.portFixer.enabled (not .Values.portFixer.remote) }}
       - name: {{ template "factorio-server-charts.fullname" . }}-sidecar
         image: "ghcr.io/zcube/factorio-port-fixer:latest"
         command:
@@ -186,6 +202,7 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
         {{- end }}
+      {{- end }}
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
