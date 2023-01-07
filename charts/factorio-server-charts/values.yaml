@@ -71,7 +71,7 @@ service:
 ## @param portFixer.remote use remote Factorio port fixer or use local Factorio port fixer
 ## @param portFixer.remoteIp Factorio port fixer remote server ip address
 portFixer:
-  enabled: true
+  enabled: false
   # warning: only 34197 port works
   remote: false
   # sample factorio port fixer server
