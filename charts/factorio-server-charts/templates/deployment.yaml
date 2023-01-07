@@ -23,7 +23,7 @@ spec:
         options:
           - name: ndots
             value: '1'
-      {{- if and (.Values.service.hostNetwork (eq .Values.service.type "NodePort") }}
+      {{- if and .Values.service.hostNetwork (eq .Values.service.type "NodePort") }}
       hostNetwork: true
       {{- else }}
       hostNetwork: false
