@@ -23,14 +23,13 @@ spec:
         options:
           - name: ndots
             value: '1'
-      {{- if and (not (and .Values.portFixer.enabled (not .Values.portFixer.remote))) (eq .Values.service.type "NodePort") }}
+      {{- if and (.Values.service.hostNetwork (eq .Values.service.type "NodePort") }}
       hostNetwork: true
       {{- else }}
       hostNetwork: false
       {{- end }}
 
-      {{- if .Values.portFixer.enabled }}
-        {{- if .Values.portFixer.remote }}
+      {{- if (and .Values.portFixer.enabled .Values.portFixer.remote) }}
       hostAliases:
       - ip: {{ .Values.portFixer.remoteIp | quote }}
         hostnames:
@@ -39,7 +38,7 @@ spec:
         - "pingpong2.factorio.com"
         - "pingpong3.factorio.com"
         - "pingpong4.factorio.com"
-        {{- else }}
+      {{- else if (and .Values.portFixer.enabled (not .Values.portFixer.remote)) }}
       hostAliases:
       - ip: "127.0.0.1"
         hostnames:
@@ -48,7 +47,6 @@ spec:
         - "pingpong2.factorio.com"
         - "pingpong3.factorio.com"
         - "pingpong4.factorio.com"
-        {{- end }}
       {{- end }}
 
       initContainers:

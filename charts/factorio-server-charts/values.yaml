@@ -66,6 +66,8 @@ service:
   ## LoadBalancer setup
   # type: LoadBalancer
   annotations: {}
+  ## Docker-Desktop with hostNetwork problem occurred
+  hostNetwork: true
 
 ## @param portFixer.enabled enable Factorio port fixer for public game
 ## @param portFixer.remote use remote Factorio port fixer or use local Factorio port fixer
