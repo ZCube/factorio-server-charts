@@ -20,3 +20,5 @@ data:
 {{ toJson .Values.white_list | indent 4 }}
   server-banlist.json: |
 {{ toJson .Values.ban_list | indent 4 }}
+  config.json: |
+{{ toJson .Values.discord_settings | indent 4 }}

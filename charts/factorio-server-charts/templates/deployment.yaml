@@ -78,6 +78,8 @@ spec:
               #sleep 100
               chown -vR factorio:factorio /factorio
               chmod -vR 777 /factorio/configs
+              # discord config
+              cp /factorio/configs/config.json /factorio/config.json
               ls -alth /factorio
           {{- with .Values.securityContext }}
           securityContext:
@@ -123,6 +125,10 @@ spec:
             - name: account-data
               mountPath: /account
             {{- end }}
+            {{- if or (.Values.discord.discordSecret) (.Values.discord.token) }}
+            - name: discord-data
+              mountPath: /discord
+            {{- end }}
       {{- end }}
       containers:
       - name: {{ template "factorio-server-charts.fullname" . }}
@@ -164,6 +170,10 @@ spec:
           {{- if or (.Values.account.accountSecret) (.Values.account.username) }}
           - name: account-data
             mountPath: /account
+          {{- end }}
+          {{- if or (.Values.discord.discordSecret) (.Values.discord.token) }}
+          - name: discord-data
+            mountPath: /discord
           {{- end }}
           - name: datadir
             mountPath: /factorio
@@ -213,6 +223,15 @@ spec:
             secretName: {{ .Values.account.accountSecret }}
           {{- else}}
             secretName: {{ template "factorio-server-charts.fullname" . }}-account
+          {{- end }}
+        {{- end }}
+        {{- if or (.Values.discord.discordSecret) (.Values.discord.token) }}
+        - name: discord-data
+          secret:
+          {{- if .Values.discord.discordSecret }}
+            secretName: {{ .Values.discord.discordSecret }}
+          {{- else}}
+            secretName: {{ template "factorio-server-charts.fullname" . }}-discord
           {{- end }}
         {{- end }}
         {{- if or (.Values.rcon.password) (.Values.rcon.passwordSecret) }}
